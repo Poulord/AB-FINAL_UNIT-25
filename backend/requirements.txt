@@ -1,1 +1,21 @@
-c:\Users\PABLO PC\Desktop\Proyectos\MSMK\UNIT - 25 Machine-Learning\BackEnd\data\embalses_limpio_final.csv
+# Dependencias del Backend - Predicción de Sequías
+
+# Framework web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Manejo de datos (alineado con tu entorno local)
+pandas==2.1.3
+numpy==1.26.4      # (< 2.0 para evitar el problema con Prophet)
+
+# Modelo de series temporales
+prophet==1.1.5
+
+# Validación de datos (1.x para evitar pydantic-core)
+pydantic==1.10.14
+
+# Middleware CORS / multipart
+python-multipart==0.0.6
+
+# Variables de entorno
+python-dotenv==1.0.0
