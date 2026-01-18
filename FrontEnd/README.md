@@ -1,0 +1,129 @@
+# Frontend - Interfaz Web de Predicción de Sequías
+
+## Descripción
+
+Frontend SPA (Single Page Application) que proporciona interfaz interactiva para el servicio de predicción de riesgo de sequía.
+Permite a los usuarios definir parámetros de predicción de dos formas y visualizar resultados de forma clara y visual.
+
+## Estructura del Proyecto
+
+```
+frontend/
+├── index.html                 # Página principal (HTML + CSS + JS embebido)
+├── assets/
+│   ├── styles.css            # Estilos CSS (modular)
+│   └── script.js             # JavaScript del cliente (modular)
+├── test_frontend.md          # Casos de prueba manual
+└── README.md                 # Este archivo
+```
+
+## Características
+
+### Formulario Dual-Mode
+
+**Modo A: Horizonte Manual**
+- Seleccionar duración en meses (3, 6, 12, 24, etc.)
+- Ideal para predicciones rápidas predefinidas
+
+**Modo B: Fecha Objetivo**
+- Seleccionar una fecha futura (ej: 2030-06)
+- Sistema calcula automáticamente los meses desde la última fecha histórica (marzo 2021)
+- Ideal para predicciones a largo plazo
+
+### Visualización de Resultados
+
+- **Recuadro de Riesgo Global**: Color dinámico según nivel (BAJO/MODERADO/ALTO/CRÍTICO)
+- **Alerta de Sequía**: Indicador visual de si hay sequía probable
+- **Tabla Mensual**: Detalle de cada mes predicho (fecha, nivel, riesgo, etc.)
+
+## Requisitos
+
+- Navegador moderno (Chrome, Firefox, Safari, Edge)
+- Acceso a la API del backend en `http://127.0.0.1:8000`
+
+## Arranque
+
+### Opción 1: Live Server (VS Code)
+
+1. Instalar extensión "Live Server" en VS Code
+2. Click derecho en `index.html` → "Open with Live Server"
+3. Se abrirá en `http://127.0.0.1:5500` (o puerto configurado)
+
+### Opción 2: Servidor HTTP local
+
+```bash
+# Con Python 3+
+python -m http.server 5500
+
+# Con Node.js (si tienes http-server instalado)
+npx http-server -p 5500
+```
+
+Luego abre `http://127.0.0.1:5500` en el navegador.
+
+## Requisitos del Backend
+
+El frontend asume que el backend está corriendo en `http://127.0.0.1:8000`.
+
+Para cambiar la URL, edita en `index.html`:
+```javascript
+const BACKEND_URL = "http://tu-url-del-backend.com";
+```
+
+## Flujo de la Aplicación
+
+1. **Usuario llena el formulario**
+   - Selecciona horizonte (Modo A) O fecha objetivo (Modo B)
+   - Selecciona escenario climático
+   - Opcionalmente ingresa nivel actual del embalse
+
+2. **Sistema valida entrada**
+   - Ambos modos requieren escenario
+   - Modo B valida que fecha sea posterior a 2021-03
+
+3. **Fetch al backend**
+   - Envía JSON con `horizonte_meses`, `escenario`, `nivel_actual_usuario`
+
+4. **Renderizado de resultados**
+   - Riesgo global con color
+   - Tabla con predicciones mensuales
+   - Mensajes de estado
+
+## APIs Utilizadas
+
+### Fetch (Cliente → Backend)
+
+```javascript
+POST http://127.0.0.1:8000/predict
+Content-Type: application/json
+
+{
+  "horizonte_meses": 12,
+  "escenario": "normal",
+  "nivel_actual_usuario": null
+}
+```
+
+Respuesta esperada:
+```json
+{
+  "horizonte_meses": 12,
+  "escenario": "normal",
+  "riesgo_global": "BAJO",
+  "sequia_probable": false,
+  "prediccion_mensual": [...]
+}
+```
+
+## Pruebas
+
+Ver `test_frontend.md` para casos de prueba manual y sugerencias de herramientas.
+
+## Próximos Pasos
+
+- Separar HTML en componentes (React, Vue, etc.)
+- Agregar gráficos con Chart.js o D3.js
+- Exportar resultados a PDF/Excel
+- Historial de consultas
+- Autenticación de usuarios
+- Configuración de URL del backend via UI

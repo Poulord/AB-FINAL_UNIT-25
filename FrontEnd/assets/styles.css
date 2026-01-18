@@ -1,0 +1,333 @@
+/*
+styles.css - Estilos de la aplicación web
+==========================================
+
+Propósito:
+- Define el diseño visual de la interfaz
+- Asegura responsividad en dispositivos móviles y desktop
+- Establece paleta de colores y tipografía
+
+Componentes principales:
+- .container: Contenedor principal con padding
+- .form-section: Área del formulario
+- .results-section: Área de resultados
+- .riesgo-box: Mostrar riesgo global con colores
+  * .bajo: Verde
+  * .moderado: Amarillo/Naranja
+  * .alto: Rojo
+  * .critico: Rojo oscuro
+- table: Tabla de predicciones mensuales
+- .error-message: Mensajes de error
+
+Diseño:
+- Grid layout para formularios
+- Colores consistentes con semántica de riesgo
+- Transiciones suaves
+- Media queries para mobile (< 768px)
+
+Tipografía:
+- Sans-serif para legibilidad
+- Tamaños escalables con em/rem
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    width: 100%;
+    padding: 40px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.form-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.form-group select,
+.form-group input {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: inherit;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button {
+    padding: 14px 40px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+#calcularBtn {
+    background-color: #667eea;
+    color: white;
+    flex: 1;
+    max-width: 300px;
+}
+
+#calcularBtn:hover:not(:disabled) {
+    background-color: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+#calcularBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.results-section {
+    display: none;
+}
+
+.results-section.visible {
+    display: block;
+}
+
+.riesgo-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.riesgo-box {
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.riesgo-box.bajo {
+    background-color: #4CAF50;
+}
+
+.riesgo-box.moderado {
+    background-color: #FF9800;
+}
+
+.riesgo-box.alto {
+    background-color: #F44336;
+}
+
+.riesgo-box.critico {
+    background-color: #C62828;
+}
+
+.sequia-info {
+    padding: 15px 20px;
+    border-radius: 8px;
+    background-color: #e3f2fd;
+    color: #1565c0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.error-message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    background-color: #ffebee;
+    color: #c62828;
+    text-align: center;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.error-message.visible {
+    display: block;
+}
+
+.loading {
+    text-align: center;
+    color: #667eea;
+    font-weight: 600;
+    padding: 20px;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.table-container {
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+thead {
+    background-color: #667eea;
+    color: white;
+}
+
+th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.situacion-normal {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.situacion-bajo {
+    color: #FF9800;
+    font-weight: 600;
+}
+
+.situacion-sequia {
+    color: #F44336;
+    font-weight: 600;
+}
+
+.boolean-true {
+    color: #F44336;
+    font-weight: 600;
+}
+
+.boolean-false {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    form {
+        grid-template-columns: 1fr;
+    }
+
+    .riesgo-container {
+        grid-template-columns: 1fr;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}

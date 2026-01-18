@@ -1,0 +1,130 @@
+<!--
+index.html - Página principal del Frontend
+============================================
+
+Propósito:
+- Interfaz web para interactuar con la API de predicción de sequías
+- Permite al usuario seleccionar horizonte, escenario y nivel del embalse
+- Muestra resultados de predicción con análisis de riesgo
+
+Características:
+- Formulario interactivo con múltiples opciones de entrada
+- Modo A: Seleccionar horizonte en meses (3, 6, 12, 24, etc.)
+- Modo B: Seleccionar fecha objetivo y calcular meses automáticamente
+- Visualización de riesgos con código de colores
+- Tabla de predicciones mensuales
+- Manejo de errores con mensajes claros
+
+Estructura:
+- <head>: Metadatos, CSS embebido
+- <body>: Formulario, secciones de resultados
+- <script>: JavaScript embebido para lógica del cliente
+
+Dependencias externas:
+- Conecta con backend en http://127.0.0.1:8000 (configurable)
+- Usa Fetch API para peticiones HTTP (sin librerías adicionales)
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Riesgo de Sequía en Embalses</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌊 Simulador de Riesgo de Sequía</h1>
+            <p class="subtitle">
+                Prototipo de predicción de sequía en embalses usando análisis de series temporales con Prophet.
+                Simula diferentes escenarios climáticos y obtén un análisis de riesgo personalizado.
+            </p>
+        </header>
+
+        <div class="form-section">
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label for="horizonte">Horizonte de predicción (meses):</label>
+                    <select id="horizonte">
+                        <option value="">Selecciona una opción</option>
+                        <option value="3">3 meses</option>
+                        <option value="6">6 meses</option>
+                        <option value="12">12 meses</option>
+                        <option value="24">24 meses</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="fechaObjetivo">Fecha objetivo (opcional):</label>
+                    <input 
+                        type="month" 
+                        id="fechaObjetivo"
+                        placeholder="Selecciona una fecha"
+                    >
+                    <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                        Si indicas una fecha, se calculará automáticamente el número de meses desde la última fecha disponible (marzo 2021)
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="escenario">Escenario climático:</label>
+                    <select id="escenario" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="normal">Normal</option>
+                        <option value="seco">Seco</option>
+                        <option value="muy_seco">Muy seco</option>
+                        <option value="humedo">Húmedo</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="nivelUsuario">Nivel actual del embalse (hm³) - Opcional:</label>
+                    <input 
+                        type="number" 
+                        id="nivelUsuario" 
+                        step="0.1"
+                        placeholder="Opcional. Nivel actual estimado (hm³)"
+                    >
+                </div>
+
+                <div class="button-container form-group-full">
+                    <button type="submit" id="calcularBtn">Calcular riesgo de sequía</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="riesgo-container">
+                <div class="riesgo-box" id="riesgoBox">
+                    Riesgo global: <span id="riesgoGlobal">-</span>
+                </div>
+                <div class="sequia-info">
+                    <span id="sequiaInfo">-</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="prediccionTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nivel (hm³)</th>
+                            <th>Situación</th>
+                            <th>¿Sequía?</th>
+                            <th>¿Nivel bajo?</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prediccionTbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>
