@@ -16,7 +16,7 @@ const IS_LOCAL =
 // 👉 Pon aquí la URL pública de tu backend en Render/Railway
 const BACKEND_URL = IS_LOCAL
   ? "http://127.0.0.1:8000"               // modo desarrollo local
-  : "https://TU-BACKEND.onrender.com";    // modo producción (Vercel → Render)
+  : "https://backend-unit-25.onrender.com";    // modo producción (Vercel → Render)
 
 // Última fecha de datos históricos del dataset
 const LAST_DATA_DATE = "2021-03-01";
