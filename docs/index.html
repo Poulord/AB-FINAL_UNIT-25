@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Riesgo de Sequía | Panel</title>
+  <meta name="description" content="Panel profesional para simular riesgo de sequía en embalses: escenarios climáticos, horizonte, análisis de riesgo y predicción mensual." />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🌊</div> 
+        <div class="brand-text">
+          <div class="brand-title">Simulador de Riesgo de Sequía</div>
+          <div class="brand-subtitle">Panel de simulación y predicción mensual</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="status-pill" id="apiStatusPill" title="Estado del backend">
+          <span class="status-dot" id="apiStatusDot" aria-hidden="true"></span>
+          <span class="status-text" id="apiStatusText">API: comprobando…</span>
+        </div>
+        <button class="ghost-btn" type="button" id="copyBackendUrl" title="Copiar URL del backend">
+          Copiar URL
+        </button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Navegación">
+      <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-simulacion" id="tabBtn-simulacion" data-tab="simulacion" type="button">Simulación</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-dashboard" id="tabBtn-dashboard" data-tab="dashboard" type="button">Dashboard</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-metodologia" id="tabBtn-metodologia" data-tab="metodologia" type="button">Metodología</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-ayuda" id="tabBtn-ayuda" data-tab="ayuda" type="button">Ayuda</button>
+    </nav>
+
+    <main id="main" class="content">
+      <!-- TAB: SIMULACIÓN -->
+      <section class="tab-panel active" id="tab-simulacion" role="tabpanel" aria-labelledby="tabBtn-simulacion">
+        <div class="grid-2">
+          <section class="card">
+            <header class="card-header">
+              <h1 class="card-title">Simulación</h1>
+              <p class="card-subtitle">Selecciona parámetros, dispara el endpoint y obtén un informe de riesgo con predicción mensual.</p>
+            </header>
+
+            <div class="card-body">
+              <form id="predictionForm" class="form">
+                <div class="form-group">
+                  <label for="horizonte">Horizonte de predicción (meses)</label>
+                  <select id="horizonte">
+                    <option value="">Selecciona una opción</option>
+                    <option value="3">3 meses</option>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                    <option value="24">24 meses</option>
+                  </select>
+                  <p class="hint">Modo A: define el horizonte manualmente.</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="fechaObjetivo">Fecha objetivo (opcional)</label>
+                  <input type="month" id="fechaObjetivo" placeholder="Selecciona una fecha" />
+                  <p class="hint">Modo B: calcula meses automáticamente desde el último dato (marzo 2021).</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="escenario">Escenario climático</label>
+                  <select id="escenario" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="normal">Normal</option>
+                    <option value="seco">Seco</option>
+                    <option value="muy_seco">Muy seco</option>
+                    <option value="humedo">Húmedo</option>
+                  </select>
+                  <p class="hint">Define el “mood” del clima. Ojalá siempre “Húmedo”, pero ya sabemos…</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="nivelUsuario">Nivel actual del embalse (hm³) (opcional)</label>
+                  <input type="number" id="nivelUsuario" step="0.1" placeholder="Nivel actual estimado (hm³)" />
+                  <p class="hint">Si lo informas, el análisis ajusta el riesgo al punto de partida.</p>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="calcularBtn" class="primary-btn">Calcular riesgo</button>
+                  <button type="button" id="resetBtn" class="secondary-btn">Limpiar</button>
+                </div>
+              </form>
+
+              <div class="inline-meta">
+                <div><span class="meta-key">Backend:</span> <span class="meta-value" id="backendUrlDisplay">-</span></div>
+                <div><span class="meta-key">Último dato:</span> <span class="meta-value" id="lastDataDisplay">-</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <header class="card-header">
+              <h2 class="card-title">Resultados</h2>
+              <p class="card-subtitle">Salidas del modelo y señales de riesgo a nivel ejecutivo (pero sin humo).</p>
+            </header>
+
+            <div class="card-body">
+              <div class="error-message" id="errorMessage" role="alert" aria-live="polite"></div>
+
+              <div class="results-section" id="resultsSection">
+                <div class="kpi-row">
+                  <div class="kpi" id="riesgoBox">
+                    <div class="kpi-label">Riesgo global</div>
+                    <div class="kpi-value" id="riesgoGlobal">-</div>
+                  </div>
+                  <div class="kpi info">
+                    <div class="kpi-label">Señal</div>
+                    <div class="kpi-value" id="sequiaInfo">-</div>
+                  </div>
+                </div>
+
+                <div class="table-container">
+                  <table id="prediccionTable">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Nivel (hm³)</th>
+                        <th>Situación</th>
+                        <th>¿Sequía?</th>
+                        <th>¿Nivel bajo?</th>
+                      </tr>
+                    </thead>
+                    <tbody id="prediccionTbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="empty-state" id="emptyState">
+                <div class="empty-emoji" aria-hidden="true">📈</div>
+                <div class="empty-title">Aún no hay predicción</div>
+                <div class="empty-text">Rellena el formulario y ejecuta una simulación. Tus KPIs están esperando su momento.</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- TAB: DASHBOARD -->
+      <section class="tab-panel" id="tab-dashboard" role="tabpanel" aria-labelledby="tabBtn-dashboard">
+        <section class="card">
+          <header class="card-header">
+            <h1 class="card-title">Dashboard</h1>
+            <p class="card-subtitle">Visión rápida: último run, parámetros y estado del servicio.</p>
+          </header>
+          <div class="card-body">
+            <div class="grid-3">
+              <div class="mini-card">
+                <div class="mini-k">Última ejecución</div>
+                <div class="mini-v" id="dashLastRun">-</div>
+                <div class="mini-h">Se actualiza al completar una predicción.</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-k">Riesgo (último)</div>
+                <div class="mini-v" id="dashLastRisk">-</div>
+                <div class="mini-h">Alineado con “Riesgo global”.</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-k">Horizonte (último)</div>
+                <div class="mini-v" id="dashLastHorizon">-</div>
+                <div class="mini-h">En meses.</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="grid-2">
+              <div class="callout">
+                <h3>Checklist operativo</h3>
+                <ul>
+                  <li>Si el estado de API está en rojo, revisa la URL del backend.</li>
+                  <li>Si la API responde pero el endpoint falla, revisa logs del servicio y CORS.</li>
+                  <li>Si los resultados son raros, valida el escenario y el horizonte (clásico).</li>
+                </ul>
+              </div>
+              <div class="callout">
+                <h3>Configuración</h3>
+                <div class="kv">
+                  <div class="kv-row"><span class="kv-k">BACKEND_URL</span><span class="kv-v" id="dashBackend">-</span></div>
+                  <div class="kv-row"><span class="kv-k">LAST_DATA_DATE</span><span class="kv-v" id="dashLastData">-</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- TAB: METODOLOGÍA -->
+      <section class="tab-panel" id="tab-metodologia" role="tabpanel" aria-labelledby="tabBtn-metodologia">
+        <section class="card">
+          <header class="card-header">
+            <h1 class="card-title">Metodología</h1>
+            <p class="card-subtitle">Qué hace el modelo, qué significa “riesgo” y cómo leer la tabla.</p>
+          </header>
+          <div class="card-body prose">
+            <h2>Cómo funciona (versión ejecutiva)</h2>
+            <p>
+              El backend genera una predicción mensual del nivel del embalse para el horizonte elegido. Con esa proyección, clasifica
+              cada mes (normal / nivel bajo / sequía) y sintetiza un <strong>riesgo global</strong>.
+            </p>
+
+            <h2>Interpretación rápida</h2>
+            <ul>
+              <li><strong>Riesgo bajo</strong>: la proyección se mantiene en niveles saludables.</li>
+              <li><strong>Riesgo moderado</strong>: hay meses con estrés (nivel bajo) pero sin señal fuerte de sequía.</li>
+              <li><strong>Riesgo alto / crítico</strong>: aparece sequía probable y/o niveles persistentemente bajos.</li>
+            </ul>
+
+            <h2>Notas operativas</h2>
+            <p>
+              Este panel está diseñado para “time-to-insight” y no para sustituir un informe hidrológico completo. Úsalo para
+              comparar escenarios y priorizar acciones.
+            </p>
+          </div>
+        </section>
+      </section>
+
+      <!-- TAB: AYUDA -->
+      <section class="tab-panel" id="tab-ayuda" role="tabpanel" aria-labelledby="tabBtn-ayuda">
+        <section class="card">
+          <header class="card-header">
+            <h1 class="card-title">Ayuda</h1>
+            <p class="card-subtitle">FAQ rápida para que el “go live” no se convierta en “go cry”.</p>
+          </header>
+          <div class="card-body prose">
+            <h2>¿Necesito crear más archivos HTML?</h2>
+            <p>
+              No. Esta versión usa <strong>una sola página</strong> con pestañas (tabs) manejadas por JavaScript. Si más adelante quieres
+              SEO avanzado o rutas reales, ahí sí tendría sentido separar en varias páginas.
+            </p>
+
+            <h2>¿Qué endpoint llama el formulario?</h2>
+            <p>
+              Hace un <code>POST</code> a <code>/predict</code> en la URL del backend configurada en <code>assets/script.js</code>.
+            </p>
+
+            <h2>Errores típicos</h2>
+            <ul>
+              <li><strong>CORS</strong>: el backend debe permitir el origen (dominio) del frontend.</li>
+              <li><strong>Backend caído</strong>: revisa el estado en la esquina superior derecha.</li>
+              <li><strong>Fecha objetivo</strong>: debe ser posterior a marzo 2021.</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-left">© <span id="yearNow"></span> Panel de simulación</div>
+      <div class="footer-right">Hecho para operar con foco: menos drama, más predicción.</div>
+    </footer>
+  </div>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>
