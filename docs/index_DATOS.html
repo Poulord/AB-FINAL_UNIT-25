@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Hidrográfico Madrid</title>
+  <link rel="stylesheet" href="assets/styles_DATOS.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <p class="eyebrow">Comunidad de Madrid · Series temporales</p>
+      <h1>Seguimiento de agua embalsada</h1>
+      <p class="subtitle">Dashboard compacto para evaluar el riesgo de sequía del año más reciente sin perder contexto histórico.</p>
+      <div class="hero-images">
+        <img src="https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=800&q=80" alt="Embalse" />
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80" alt="Río" />
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="Medidor de agua" />
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="cards" aria-label="Indicadores resumen">
+      <article class="card">
+        <p class="label">Media histórica mensual</p>
+        <p class="value" id="historical-avg">--</p>
+        <p class="hint">Promedio de todos los meses disponibles salvo el año más reciente (hm³).</p>
+      </article>
+      <article class="card">
+        <p class="label">Media mensual <span id="current-year-label">2022</span></p>
+        <p class="value" id="avg-current">--</p>
+        <p class="hint">Promedio del año más reciente disponible (hm³).</p>
+      </article>
+      <article class="card">
+        <p class="label">Diferencia vs. histórico</p>
+        <p class="value" id="diff-percent">--</p>
+        <p class="hint">Porcentaje por encima o por debajo de la media histórica.</p>
+      </article>
+      <article class="card accent" id="risk-card">
+        <p class="label">Indicador de sequía 2022</p>
+        <p class="value" id="risk-level">--</p>
+        <p class="hint" id="risk-hint">Evaluando datos...</p>
+      </article>
+    </section>
+
+    <section class="chart-section">
+      <div class="section-header between">
+        <div>
+          <p class="eyebrow">Explora los datos</p>
+          <h2>Una gráfica a la vez para un espacio pequeño</h2>
+          <p class="section-subtitle">Activa la vista que necesites sin salir de la página.</p>
+        </div>
+        <div class="chart-controls" role="group" aria-label="Cambiar gráfica">
+          <button class="control-btn active" data-view="time">Evolución</button>
+          <button class="control-btn" data-view="comparison">Año reciente vs histórico</button>
+          <button class="control-btn" data-view="monthly">Promedio mensual</button>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="main-chart" height="240"></canvas>
+      </div>
+      <p class="chart-hint" id="chart-description">Curva mensual del volumen total embalsado.</p>
+    </section>
+
+    <section class="powerbi-section" aria-label="Vistas de Power BI">
+      <div class="section-header between">
+        <div>
+          <p class="eyebrow">Integración con Power BI</p>
+          <h2>Accede a las pestañas del informe</h2>
+          <p class="section-subtitle">Elige la vista y, si estás en Power BI Service, pega el iframe de publicación para verla aquí mismo.</p>
+        </div>
+        <div class="chart-controls compact" role="group" aria-label="Cambiar pestaña de Power BI">
+          <button class="control-btn active" data-pbi-btn="entendimiento">Entendimiento de los datos</button>
+          <button class="control-btn" data-pbi-btn="diferencia">¿Qué embalse tiene mayor diferencia entre su máximo y mínimo?</button>
+          <button class="control-btn" data-pbi-btn="sequia">¿Posibilidad de Sequía?</button>
+          <button class="control-btn" data-pbi-btn="prediccion">Predicción Hidrográfica 12 meses</button>
+        </div>
+      </div>
+      <div class="pbi-panels">
+        <div class="pbi-panel active" data-pbi-panel="entendimiento">
+          <div class="pbi-placeholder">
+            <p class="pbi-title">Entendimiento de los datos</p>
+            <p>Inserta aquí el iframe público de la pestaña “Entendimiento de los datos”. Si prefieres, abre directamente el .pbix:</p>
+            <a class="pill" href="Notebook/AB%20FINAL_Terminado.pbix" download>Descargar Power BI</a>
+          </div>
+        </div>
+        <div class="pbi-panel" data-pbi-panel="diferencia">
+          <div class="pbi-placeholder">
+            <p class="pbi-title">¿Qué embalse tiene mayor diferencia entre su máximo y mínimo?</p>
+            <p>Usa esta pestaña para visualizar el rango de cada embalse y contrastar máximos y mínimos históricos.</p>
+            <a class="pill" href="Notebook/AB%20FINAL_Terminado.pbix" download>Descargar Power BI</a>
+          </div>
+        </div>
+        <div class="pbi-panel" data-pbi-panel="sequia">
+          <div class="pbi-placeholder">
+            <p class="pbi-title">¿Posibilidad de Sequía?</p>
+            <p>Inserta el iframe de la sección con los umbrales de sequía y la lectura del punto de control.</p>
+            <a class="pill" href="Notebook/AB%20FINAL_Terminado.pbix" download>Descargar Power BI</a>
+          </div>
+        </div>
+        <div class="pbi-panel" data-pbi-panel="prediccion">
+          <div class="pbi-placeholder">
+            <p class="pbi-title">Predicción Hidrográfica 12 meses</p>
+            <p>Agrega aquí la pestaña de Prophet con el escenario a 12 meses y su interpretación.</p>
+            <a class="pill" href="Notebook/AB%20FINAL_Terminado.pbix" download>Descargar Power BI</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info compact">
+      <div>
+        <h3>Sobre los datos</h3>
+        <p>El CSV contiene registros mensuales de niveles de agua embalsada en distintos embalses de la Comunidad de Madrid. Si no existe columna <em>total</em>, el dashboard suma todas las columnas numéricas por mes.</p>
+      </div>
+      <div>
+        <h3>Cómo interpretar</h3>
+        <p>Una tendencia descendente prolongada o valores del último año por debajo de la media histórica sugieren riesgo de sequía. La tarjeta de riesgo resume el diferencial porcentual.</p>
+      </div>
+      <div>
+        <h3>Conclusiones</h3>
+        <p id="conclusion-text">Cargando conclusiones a partir de los datos...</p>
+        <p>Verde: año reciente por encima del histórico. Ámbar: similar. Rojo: déficit notable.</p>
+      </div>
+    </section>
+
+    <section class="insights" aria-label="Hallazgos clave">
+      <div class="section-header">
+        <p class="eyebrow">Conclusiones finales</p>
+        <h2>Lo que revela el EDA y el modelo Prophet</h2>
+        <p class="section-subtitle">Resumimos la tendencia, la estacionalidad, los umbrales de sequía y el único momento con riesgo leve.</p>
+      </div>
+      <div class="insights-grid">
+        <article class="insight-card">
+          <h3>Tendencia y estabilidad</h3>
+          <p id="trend-insight">Analizando la serie completa...</p>
+        </article>
+        <article class="insight-card">
+          <h3>Estacionalidad</h3>
+          <p id="seasonality-insight">Calculando meses más suaves y más bajos...</p>
+        </article>
+        <article class="insight-card">
+          <h3>Umbral de sequía</h3>
+          <p id="threshold-insight">Derivando referencia de mínimos históricos...</p>
+        </article>
+        <article class="insight-card accent">
+          <div class="insight-pill">Predicción a 12 meses</div>
+          <h3>¿Habrá sequía?</h3>
+          <p id="forecast-insight">Evaluando la proyección de Prophet...</p>
+          <ul class="insight-bullets">
+            <li id="october-note">-</li>
+            <li>El resto del año permanece lejos del umbral bajo.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Dashboard hidrográfico · Comunidad de Madrid · Datos históricos de embalses</p>
+    <div class="footer-links">
+      <a href="Notebook/AB_FINAL_2_0%20(1).ipynb" download>Descargar csv de los Datos</a>
+      <span aria-hidden="true">·</span>
+      <a href="data/df_embalses_medio_limpio.csv" download>Descargar Power BI</a>
+    </div>
+  </footer>
+
+  <script src="assets/script_DATOS.js"></script>
+</body>
+</html>

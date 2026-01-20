@@ -1,18 +1,23 @@
-# Framework web
+# Framework web y servidor
 FastAPI==0.104.1
 Uvicorn[standard]==0.24.0
 
-# Manejo de datos
+# Manejo de datos (Versiones específicas para evitar conflictos)
 pandas==2.1.3
 numpy==1.26.4
 
-# Modelo de series temporales
+# Modelo de series temporales y dependencias de Prophet
 prophet==1.1.5
-cmdstanpy==1.2.0     # <-- CLAVE: fijar version compatible de cmdstanpy
+cmdstanpy==1.2.0
 
-# Validación de datos (ojo con FastAPI)
-pydantic==1.10.14    # <-- IMPORTANTÍSIMO para FastAPI 0.104.1
-
-# Middleware CORS / utilidades
-python-multipart==0.0.6
+# Validación y variables de entorno
+pydantic==1.10.14
 python-dotenv==1.0.0
+python-multipart==0.0.6
+
+# Visualización y Análisis (necesarios para el módulo)
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Pruebas unitarias
+pytest>=8.0.0
