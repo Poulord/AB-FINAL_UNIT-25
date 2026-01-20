@@ -15,13 +15,11 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://front-end-unit-25.vercel.app",
-        "https://poulord.github.io",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # --- Modelos ---
 class PeticionPrediccion(BaseModel):

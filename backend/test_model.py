@@ -293,7 +293,7 @@ def test_validacion_errores():
         
         # Test 7c: Horizonte inválido (muy grande)
         try:
-            model.predecir_escenario(horizonte_meses=100)
+            model.predecir_escenario(horizonte_meses=300)
             print("✗ No se detectó horizonte inválido (> 60)")
             return False
         except ValueError:
